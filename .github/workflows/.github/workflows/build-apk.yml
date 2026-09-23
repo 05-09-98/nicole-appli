@@ -1,0 +1,48 @@
+name: Construire l'APK de Nicole
+
+on:
+  push:
+    branches: [ main ]
+  workflow_dispatch: {}
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Récupérer le projet
+        uses: actions/checkout@v4
+
+      - name: Installer Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+
+      - name: Garder toujours la même signature (important pour les mises à jour)
+        uses: actions/cache@v4
+        with:
+          path: ~/.android/debug.keystore
+          key: nicole-debug-keystore-v1
+
+      - name: Créer le squelette Android
+        run: flutter create --platforms=android --org com.nicole.ecole app_build
+
+      - name: Copier le code et le contenu de Nicole
+        run: |
+          cp custom/main.dart app_build/lib/main.dart
+          cp custom/pubspec.yaml app_build/pubspec.yaml
+          mkdir -p app_build/assets/www
+          cp -r assets/www/* app_build/assets/www/
+
+      - name: Installer les dépendances
+        working-directory: app_build
+        run: flutter pub get
+
+      - name: Fabriquer le fichier APK
+        working-directory: app_build
+        run: flutter build apk --release
+
+      - name: Mettre l'APK à disposition au téléchargement
+        uses: actions/upload-artifact@v4
+        with:
+          name: Nicole-APK
+          path: app_build/build/app/outputs/flutter-apk/app-release.apk
