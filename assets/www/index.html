@@ -1,0 +1,803 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Nicole — École d'Informatique</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,700&family=Inter:wght@400;500;600;700&display=swap">
+<style>
+:root{
+  --ink:#221735;--paper:#F5F2FB;--card:#FFFFFF;--sub:#6B6280;
+  --plum:#4B2E83;--plum2:#7A4FC9;--gold:#F5A623;--teal:#1B8A7A;
+  --border:#E4DEF2;--radius:20px;
+  --serif:'Fraunces',Georgia,serif;--sans:'Inter',-apple-system,Segoe UI,Roboto,sans-serif;
+  box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){--ink:#F0EBFA;--paper:#171126;--card:#221A38;--sub:#A99FC4;--border:#33284D;}
+}
+:root[data-theme="dark"]{--ink:#F0EBFA;--paper:#171126;--card:#221A38;--sub:#A99FC4;--border:#33284D;}
+*{box-sizing:border-box}
+html{scroll-padding-top:env(safe-area-inset-top,0px);height:100%}
+body{height:100%;margin:0;background:var(--paper);color:var(--ink);font-family:var(--sans);line-height:1.55;-webkit-font-smoothing:antialiased}
+#app{max-width:760px;margin:0 auto;padding:0 16px 60px}
+h1,h2,h3{font-family:var(--serif);margin:0 0 8px;font-weight:600;letter-spacing:-.01em}
+p{margin:0 0 10px}
+.card{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:20px;margin-bottom:14px}
+.btn{display:inline-block;background:var(--plum);color:#fff;border:none;border-radius:14px;padding:13px 22px;font-family:var(--sans);font-size:16px;font-weight:600;cursor:pointer;transition:transform .12s}
+.btn:active{transform:scale(.97)}
+.btn.secondary{background:transparent;color:var(--plum);border:2px solid var(--plum)}
+:root[data-theme="dark"] .btn.secondary,:root:not([data-theme="light"]) .btn.secondary{color:var(--gold);border-color:var(--gold)}
+.btn.big{font-size:19px;padding:17px 24px;width:100%}
+.row{display:flex;gap:10px;flex-wrap:wrap}
+.pill{background:var(--card);border:1px solid var(--border);border-radius:999px;padding:7px 15px;font-size:14px;color:var(--sub);font-weight:500}
+.progress-bar{background:var(--border);border-radius:999px;height:12px;overflow:hidden}
+.progress-fill{background:linear-gradient(90deg,var(--gold),var(--plum2));height:100%;transition:width .5s ease}
+
+/* ---- HERO ---- */
+.hero{border-radius:26px;padding:30px 24px;margin:16px 0 20px;position:relative;overflow:hidden;
+  background:linear-gradient(160deg,#2D1B54 0%,#4B2E83 45%,#B4548A 78%,#F5A623 100%);color:#fff}
+.hero h1{font-size:28px;color:#fff;margin-bottom:4px}
+.hero .sub{color:#EADFFF;font-size:15px}
+.hero-stats{display:flex;gap:10px;margin-top:18px;flex-wrap:wrap}
+.hero-stat{background:rgba(255,255,255,.14);backdrop-filter:blur(2px);border-radius:14px;padding:10px 14px;flex:1;min-width:100px}
+.hero-stat .n{font-family:var(--serif);font-size:22px;display:block}
+.hero-stat .l{font-size:12px;color:#EADFFF}
+.hero .progress-bar{background:rgba(255,255,255,.22);margin-top:16px}
+.hero .progress-fill{background:#F5A623}
+
+/* ---- PATH / TIMELINE ---- */
+.path{position:relative;margin-top:6px;padding-left:34px}
+.path::before{content:"";position:absolute;left:13px;top:8px;bottom:8px;width:3px;
+  background:linear-gradient(var(--gold),var(--plum2));border-radius:3px;opacity:.5}
+.path-item{position:relative;margin-bottom:14px;cursor:pointer}
+.path-item::before{content:"";position:absolute;left:-34px;top:14px;width:26px;height:26px;border-radius:50%;
+  background:var(--card);border:3px solid var(--plum2);z-index:1}
+.path-item.done::before{background:var(--teal);border-color:var(--teal)}
+.path-item .card{transition:transform .15s}
+.path-item:active .card{transform:scale(.98)}
+
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+@media(max-width:500px){.grid{grid-template-columns:1fr}}
+.badge{font-size:26px;background:var(--card);border-radius:14px;padding:10px;text-align:center;border:1px solid var(--border)}
+.key{display:inline-flex;align-items:center;justify-content:center;min-width:34px;height:34px;padding:0 6px;margin:2px;
+  background:var(--card);border:1px solid var(--border);border-radius:9px;font-size:13px;cursor:pointer;user-select:none;font-family:var(--sans)}
+.key.wide{min-width:70px}
+.key.active{background:var(--plum2);color:#fff;border-color:var(--plum2)}
+.key.done{background:var(--teal);color:#fff;border-color:var(--teal)}
+.kbrow{display:flex;flex-wrap:nowrap;overflow-x:auto;padding-bottom:4px}
+.lesson-img{font-size:56px;text-align:center;margin:6px 0 14px}
+.mission{background:linear-gradient(135deg,#F5EFFF,#FFF4E3);border:2px solid var(--plum2);border-radius:16px;padding:18px;margin-top:14px}
+:root[data-theme="dark"] .mission,:root:not([data-theme="light"]) .mission{background:linear-gradient(135deg,#2A1F4D,#332818)}
+.feedback{margin-top:10px;padding:11px 14px;border-radius:12px;font-weight:600}
+.feedback.ok{background:#DCF6EC;color:#0F6B4F}
+.feedback.err{background:#FCE4E4;color:#9A2E2E}
+:root[data-theme="dark"] .feedback.ok,:root:not([data-theme="light"]) .feedback.ok{background:#123B2C;color:#8FE8C4}
+:root[data-theme="dark"] .feedback.err,:root:not([data-theme="light"]) .feedback.err{background:#4A2020;color:#F5B5B5}
+input[type=text]{width:100%;padding:13px;border-radius:12px;border:1px solid var(--border);background:var(--paper);color:var(--ink);font-size:16px;font-family:var(--sans)}
+.topbar{display:flex;justify-content:space-between;align-items:center;position:sticky;top:env(safe-area-inset-top,0px);
+  background:var(--paper);padding:12px 0;z-index:5}
+.link{color:var(--plum);cursor:pointer;font-weight:600;background:none;border:none;font-size:15px;padding:0;font-family:var(--sans)}
+:root[data-theme="dark"] .link,:root:not([data-theme="light"]) .link{color:var(--gold)}
+.sub{color:var(--sub);font-size:14px}
+.mod-icon{font-size:30px;line-height:1}
+.mod-locked{opacity:.55;filter:grayscale(.3)}
+
+@keyframes pop{0%{transform:scale(.4);opacity:0}60%{transform:scale(1.15)}100%{transform:scale(1);opacity:1}}
+.celebrate{animation:pop .45s cubic-bezier(.2,1.4,.4,1)}
+@media (prefers-reduced-motion: reduce){.celebrate{animation:none}}
+</style>
+</head>
+<body>
+<div id="app"></div>
+<script>
+const LESSONS = {
+  m0: {
+    title: "Découverte de l'ordinateur", icon: "🖥️",
+    steps: [
+      {type:"lesson", img:"💻", title:"Qu'est-ce qu'un ordinateur ?",
+        text:"Un ordinateur est une machine qui t'aide à écrire, regarder des vidéos, chercher des informations et bien plus. Tu lui donnes des instructions avec la souris et le clavier, et il t'obéit."},
+      {type:"lesson", img:"🖥️🖱️⌨️", title:"Les parties de l'ordinateur",
+        text:"Écran : là où tu vois tout.\nUnité centrale : le \"cerveau\" de la machine.\nClavier : pour écrire.\nSouris : pour cliquer et te déplacer.\nUSB : pour brancher des accessoires.\nWebcam : pour te filmer."},
+      {type:"quiz", q:"À quoi sert la souris ?",
+        options:["À écrire du texte","À cliquer et te déplacer sur l'écran","À brancher un câble"], correct:1},
+      {type:"lesson", img:"🔌", title:"Allumer l'ordinateur",
+        text:"Cherche le bouton avec ce symbole : ⏻ (un rond avec un trait). Il est souvent sur le côté de l'écran ou au-dessus du clavier. Appuie une seule fois, puis attends."},
+      {type:"mission", instruction:"Imagine le bouton ⏻ ci-dessous. Clique dessus pour \"allumer\" ton ordinateur.", action:"click_power"},
+      {type:"lesson", img:"🖱️", title:"Clic gauche et clic droit",
+        text:"Clic gauche (le bouton principal) : pour sélectionner ou ouvrir quelque chose.\nClic droit : pour voir un menu d'options.\nDouble-clic : deux clics rapides, pour ouvrir un dossier ou un logiciel."},
+      {type:"mission", instruction:"Fais un double-clic sur l'icône ci-dessous pour \"ouvrir\" le dossier.", action:"double_click"},
+      {type:"quiz", q:"Que fait un double-clic sur une icône ?", options:["Il l'efface","Il l'ouvre","Il l'éteint"], correct:1},
+    ]
+  },
+  m1: {
+    title: "Le clavier", icon: "⌨️",
+    steps: [
+      {type:"lesson", img:"⌨️", title:"Découvrir le clavier",
+        text:"Le clavier sert à écrire des lettres, des chiffres et à donner des commandes. Regarde le clavier virtuel plus bas : clique sur une touche pour découvrir son rôle."},
+      {type:"keyboard_explore"},
+      {type:"mission", instruction:"Clique dans la zone de texte, écris ton prénom, puis appuie sur la touche Entrée.", action:"type_enter"},
+      {type:"lesson", img:"⌃⌥⇧", title:"Les touches spéciales",
+        text:"Ctrl (Contrôle), Alt et Shift (Majuscule) ne font rien seules : elles se combinent avec d'autres touches pour créer des raccourcis puissants."},
+      {type:"mission", instruction:"Sur ton vrai clavier (ou en cliquant les touches ci-dessous), reproduis : Ctrl + C (copier).", action:"combo", combo:["Ctrl","C"]},
+      {type:"mission", instruction:"Essaie maintenant : Ctrl + V (coller).", action:"combo", combo:["Ctrl","V"]},
+      {type:"quiz", q:"Ctrl + C sert à...", options:["Copier","Effacer tout","Éteindre l'ordinateur"], correct:0},
+    ]
+  },
+  m2: {
+    title: "Windows et les fenêtres", icon: "🪟",
+    steps: [
+      {type:"lesson", img:"🪟", title:"Le Bureau",
+        text:"Le Bureau est le grand écran que tu vois après l'allumage. C'est comme une table de travail : tu y poses tes dossiers et tes raccourcis."},
+      {type:"lesson", img:"🗔", title:"Ouvrir, réduire, fermer",
+        text:"Chaque logiciel s'ouvre dans une fenêtre. En haut à droite tu trouves 3 boutons : réduire (—), agrandir (☐) et fermer (✕)."},
+      {type:"mission", instruction:"Clique sur le bon bouton pour FERMER la fenêtre ci-dessous.", action:"window_close"},
+      {type:"quiz", q:"Quel symbole permet de fermer une fenêtre ?", options:["—","☐","✕"], correct:2},
+    ]
+  },
+  m3: {
+    title: "Fichiers et dossiers", icon: "🗂️",
+    steps: [
+      {type:"lesson", img:"🗂️", title:"Qu'est-ce qu'un dossier ?",
+        text:"Un dossier range des fichiers, un peu comme une chemise en carton range des feuilles. Tu peux créer, renommer, déplacer ou supprimer des dossiers."},
+      {type:"mission", instruction:"Renomme le dossier ci-dessous en \"Mes Documents\", puis appuie sur Entrée.", action:"rename_folder"},
+      {type:"quiz", q:"Un dossier sert à...", options:["Ranger des fichiers","Allumer l'ordinateur","Naviguer sur Internet"], correct:0},
+    ]
+  },
+  m4: {
+    title: "Internet", icon: "🌐",
+    steps: [
+      {type:"lesson", img:"🌐", title:"Qu'est-ce qu'Internet ?",
+        text:"Internet est un immense réseau qui relie les ordinateurs du monde entier. Il te permet de consulter des sites, regarder des vidéos, discuter et apprendre."},
+      {type:"lesson", img:"🧭", title:"Le navigateur et la barre d'adresse",
+        text:"Le navigateur (Chrome, Firefox...) est le logiciel qui ouvre les sites. En haut, la barre d'adresse affiche où tu te trouves, par exemple google.com."},
+      {type:"mission", instruction:"Dans la barre d'adresse ci-dessous, écris un site (par exemple google.com) puis appuie sur Entrée.", action:"browser_url"},
+      {type:"quiz", q:"Comment s'appelle le logiciel qui permet d'aller sur Internet ?", options:["Le navigateur","Le dossier","Le clavier"], correct:0},
+    ]
+  },
+  m5: {
+    title: "Bien chercher sur Google", icon: "🔎",
+    steps: [
+      {type:"lesson", img:"🔎", title:"Chercher efficacement",
+        text:"Pour bien chercher, écris seulement quelques mots-clés précis, pas une phrase entière. Exemple : au lieu de \"comment faire pour cuisiner du riz\", écris simplement \"recette riz\"."},
+      {type:"mission", instruction:"Écris une recherche courte (par exemple : recette riz) et appuie sur Entrée.", action:"search_query"},
+      {type:"quiz", q:"Pour bien chercher, il vaut mieux écrire...", options:["Une phrase très longue","Quelques mots-clés précis","Rien du tout"], correct:1},
+    ]
+  },
+  m6: {
+    title: "L'e-mail", icon: "📧",
+    steps: [
+      {type:"lesson", img:"📧", title:"Qu'est-ce qu'un e-mail ?",
+        text:"Un e-mail (courriel) est une lettre envoyée par Internet. Il a besoin d'une adresse de destinataire, d'un objet (le sujet) et d'un message."},
+      {type:"mission", instruction:"Remplis le destinataire et le message ci-dessous, puis clique sur Envoyer.", action:"compose_email"},
+      {type:"quiz", q:"L'objet d'un e-mail sert à...", options:["Résumer le sujet du message","Donner ton mot de passe","Éteindre l'ordinateur"], correct:0},
+    ]
+  },
+  m7: {
+    title: "Sécurité et mots de passe", icon: "🔒",
+    steps: [
+      {type:"lesson", img:"🔒", title:"Pourquoi un mot de passe fort ?",
+        text:"Un mot de passe protège tes comptes. Un mot de passe fort mélange lettres majuscules, minuscules, chiffres et symboles, et fait au moins 8 caractères. Ne le partage jamais."},
+      {type:"mission", instruction:"Invente un mot de passe d'au moins 8 caractères et appuie sur Entrée.", action:"password_check"},
+      {type:"quiz", q:"Un bon mot de passe doit...", options:["Être ton prénom","Mélanger lettres, chiffres et symboles","Être identique partout"], correct:1},
+    ]
+  },
+  m8: {
+    title: "Word — traitement de texte", icon: "📝",
+    steps: [
+      {type:"lesson", img:"📝", title:"Qu'est-ce que Word ?",
+        text:"Word est un logiciel de traitement de texte : il sert à écrire des lettres, des CV ou des rapports, avec une belle mise en forme."},
+      {type:"lesson", img:"𝐁 𝑰 U̲", title:"Mettre en forme le texte",
+        text:"Ctrl+G met le texte en gras, Ctrl+I en italique, Ctrl+U le souligne. Sélectionne d'abord le texte avec la souris, puis applique le raccourci."},
+      {type:"mission", instruction:"Écris une phrase comme si c'était le début de ton CV, puis appuie sur Entrée.", action:"type_enter",
+        successMsg:"✅ Ton premier document est né !", badge:"🏆 Premier document Word"},
+      {type:"quiz", q:"Quel raccourci met du texte en gras dans Word ?", options:["Ctrl+G","Ctrl+P","Ctrl+O"], correct:0},
+    ]
+  },
+  m9: {
+    title: "Excel — tableurs", icon: "📊",
+    steps: [
+      {type:"lesson", img:"📊", title:"Qu'est-ce qu'Excel ?",
+        text:"Excel est un tableur : les données sont rangées en lignes et colonnes appelées cellules. Chaque cellule a une adresse, comme A1 ou B2."},
+      {type:"lesson", img:"➕", title:"Les formules",
+        text:"Une formule commence toujours par le signe =. Par exemple =A1+A2 additionne automatiquement le contenu de deux cellules."},
+      {type:"mission", instruction:"Écris un nombre dans la cellule ci-dessous puis appuie sur Entrée.", action:"type_enter",
+        successMsg:"✅ Ta première cellule est remplie !", badge:"🏆 Premier tableau Excel"},
+      {type:"quiz", q:"Une formule Excel commence toujours par...", options:["=","#","@"], correct:0},
+    ]
+  },
+  m10: {
+    title: "PowerPoint — présentations", icon: "📽️",
+    steps: [
+      {type:"lesson", img:"📽️", title:"Qu'est-ce que PowerPoint ?",
+        text:"PowerPoint permet de créer des diapositives pour présenter tes idées à l'oral, avec du texte, des images et des graphiques."},
+      {type:"lesson", img:"🖼️", title:"Une bonne diapositive",
+        text:"Une bonne diapositive contient peu de texte et une seule idée claire. Le public doit comprendre en un coup d'œil, pas lire un roman."},
+      {type:"mission", instruction:"Écris le titre de ta première diapositive, puis appuie sur Entrée.", action:"type_enter",
+        successMsg:"✅ Ta première diapositive est prête !", badge:"🏆 Première présentation"},
+      {type:"quiz", q:"Une bonne diapositive doit avoir...", options:["Beaucoup de texte","Une idée claire et peu de texte","Aucun titre"], correct:1},
+    ]
+  },
+  m11: {
+    title: "Introduction à la programmation", icon: "💡",
+    steps: [
+      {type:"lesson", img:"💡", title:"Qu'est-ce que programmer ?",
+        text:"Programmer, c'est donner des instructions précises à un ordinateur, étape par étape, dans un langage qu'il comprend, pour qu'il réalise une tâche."},
+      {type:"lesson", img:"🧩", title:"Qu'est-ce qu'un algorithme ?",
+        text:"Un algorithme est une suite d'étapes logiques pour résoudre un problème, comme une recette de cuisine : d'abord ceci, ensuite cela, puis enfin ce résultat."},
+      {type:"quiz", q:"Un algorithme est...", options:["Une suite d'étapes pour résoudre un problème","Un virus informatique","Un type de souris"], correct:0},
+    ]
+  },
+  m12: {
+    title: "HTML — le squelette du web", icon: "🏗️",
+    steps: [
+      {type:"lesson", img:"🏗️", title:"HTML, le squelette d'une page",
+        text:"HTML structure le contenu d'une page web à l'aide de balises. Une balise s'écrit entre chevrons, par exemple <h1>...</h1>."},
+      {type:"lesson", img:"🏷️", title:"Les balises courantes",
+        text:"<h1> crée un grand titre.\n<p> crée un paragraphe de texte.\n<img> affiche une image.\n<a> crée un lien cliquable."},
+      {type:"mission", instruction:"Écris exactement <h1>Bonjour</h1> dans la zone ci-dessous, puis clique sur Vérifier : regarde le résultat apparaître juste en dessous.",
+        action:"code_html", check:"h1tag", hint:"Essaie d'écrire exactement : <h1>Bonjour</h1>",
+        successMsg:"✅ Ta première page HTML s'affiche !", badge:"🏆 Premier code HTML"},
+      {type:"quiz", q:"Quelle balise crée un titre ?", options:["<h1>","<p>","<img>"], correct:0},
+    ]
+  },
+  m13: {
+    title: "CSS — la couleur et le style", icon: "🎨",
+    steps: [
+      {type:"lesson", img:"🎨", title:"CSS, la couleur et le style",
+        text:"CSS contrôle l'apparence d'une page : couleurs, tailles, espacements. HTML donne le contenu, CSS l'habille."},
+      {type:"lesson", img:"🖊️", title:"La syntaxe CSS",
+        text:"Une règle CSS s'écrit propriété: valeur; — par exemple color: red; change la couleur du texte en rouge."},
+      {type:"mission", instruction:"Écris exactement color: red; dans la zone ci-dessous pour changer la couleur du texte \"Bonjour !\" affiché au-dessus.",
+        action:"code_css", check:"colorprop", hint:"Essaie d'écrire exactement : color: red;",
+        successMsg:"✅ Ton style s'applique en direct !", badge:"🏆 Premier style CSS"},
+      {type:"quiz", q:"En CSS, la syntaxe correcte est...", options:["propriété: valeur;","valeur = propriété","propriété -> valeur"], correct:0},
+    ]
+  },
+  m14: {
+    title: "JavaScript — l'interactivité", icon: "⚡",
+    steps: [
+      {type:"lesson", img:"⚡", title:"JavaScript, l'interactivité",
+        text:"JavaScript rend une page web vivante et interactive : clics de bouton, animations, calculs, vérifications de formulaire."},
+      {type:"lesson", img:"🧮", title:"Calculer avec JavaScript",
+        text:"JavaScript peut faire des calculs directement, comme une calculatrice : 5 * 3 donne 15."},
+      {type:"mission", instruction:"Écris un calcul, par exemple 5*3, dans la zone ci-dessous puis clique sur Exécuter.",
+        action:"code_js", successMsg:"✅ JavaScript a calculé le résultat pour toi !", badge:"🏆 Premier code JavaScript"},
+      {type:"quiz", q:"JavaScript sert surtout à...", options:["Rendre une page interactive","Structurer le contenu","Choisir les couleurs"], correct:0},
+    ]
+  },
+  m15: {
+    title: "Python", icon: "🐍",
+    steps: [
+      {type:"lesson", img:"🐍", title:"Qu'est-ce que Python ?",
+        text:"Python est un langage de programmation simple à lire, très utilisé pour l'automatisation, l'analyse de données et l'intelligence artificielle."},
+      {type:"lesson", img:"🖨️", title:"Afficher du texte : print()",
+        text:"En Python, print(\"Bonjour\") affiche le texte \"Bonjour\" à l'écran. Le texte à afficher se place entre guillemets, à l'intérieur des parenthèses."},
+      {type:"mission", instruction:'Écris exactement print("Bonjour") dans la zone ci-dessous, puis clique sur Exécuter.',
+        action:"code_python", successMsg:"✅ Ton premier programme Python fonctionne !", badge:"🏆 Premier code Python",
+        hint:'Essaie d\'écrire exactement : print("Bonjour")'},
+      {type:"quiz", q:"Pour afficher du texte en Python, on utilise...", options:["print()","show()","display()"], correct:0},
+    ]
+  },
+  m16: {
+    title: "Bases de données et SQL", icon: "🗄️",
+    steps: [
+      {type:"lesson", img:"🗄️", title:"Qu'est-ce qu'une base de données ?",
+        text:"Une base de données range des informations de façon organisée en tables, un peu comme Excel, mais conçue pour être utilisée par des programmes."},
+      {type:"lesson", img:"🔍", title:"Le langage SQL",
+        text:"SQL est le langage utilisé pour interroger une base de données. Par exemple, SELECT * FROM clients récupère toutes les informations de la table clients."},
+      {type:"mission", instruction:"Écris SELECT * FROM clients puis appuie sur Entrée.", action:"type_enter",
+        successMsg:"✅ Ta première requête SQL a récupéré les données !", badge:"🏆 Première requête SQL"},
+      {type:"quiz", q:"SELECT sert à...", options:["Récupérer des données","Supprimer la base de données","Éteindre le serveur"], correct:0},
+    ]
+  },
+  m17: {
+    title: "Git et GitHub", icon: "🔧",
+    steps: [
+      {type:"lesson", img:"🔧", title:"Qu'est-ce que Git ?",
+        text:"Git est un outil qui garde en mémoire l'historique des modifications d'un projet de code, pour pouvoir revenir en arrière ou travailler à plusieurs sans tout écraser."},
+      {type:"lesson", img:"🐙", title:"GitHub",
+        text:"GitHub est un site qui héberge les projets Git en ligne, pour les stocker, les partager et collaborer avec d'autres développeurs."},
+      {type:"mission", instruction:'Écris git commit -m "Mon premier commit" puis appuie sur Entrée.', action:"type_enter",
+        successMsg:"✅ Ton premier commit est enregistré dans l'historique !", badge:"🏆 Premier commit Git"},
+      {type:"quiz", q:"GitHub sert à...", options:["Stocker et partager du code en ligne","Envoyer des e-mails","Dessiner des images"], correct:0},
+    ]
+  },
+  m18: {
+    title: "Développement web", icon: "🌍",
+    steps: [
+      {type:"lesson", img:"🌍", title:"Assembler HTML, CSS et JavaScript",
+        text:"Un vrai site web combine les trois langages que tu as appris : HTML pour la structure, CSS pour le style, et JavaScript pour l'interactivité."},
+      {type:"lesson", img:"🧱", title:"Le rôle de chaque langage",
+        text:"HTML : le squelette (les titres, les textes, les images).\nCSS : l'habillage (les couleurs, les tailles).\nJavaScript : le comportement (les clics, les calculs, les animations)."},
+      {type:"mission", instruction:"Construis une mini-page : écris une balise <h1> pour un titre ET une balise <p> pour un paragraphe, puis clique sur Vérifier.",
+        action:"code_webpage", successMsg:"✅ Ta première mini-page web est en ligne !", badge:"🏆 Premier site web",
+        hint:"Il te faut à la fois une balise <h1>...</h1> et une balise <p>...</p>."},
+      {type:"quiz", q:"Un site web combine...", options:["HTML, CSS et JavaScript","Seulement des images","Seulement Excel"], correct:0},
+    ]
+  },
+  m19: {
+    title: "Les APIs", icon: "🔌",
+    steps: [
+      {type:"lesson", img:"🔌", title:"Qu'est-ce qu'une API ?",
+        text:"Une API permet à deux programmes de communiquer entre eux, comme un serveur de restaurant qui transmet ta commande à la cuisine et te ramène le plat."},
+      {type:"lesson", img:"🌦️", title:"Un exemple concret",
+        text:"Une application météo n'invente pas les températures : elle interroge l'API d'un service météo, qui lui renvoie les données à afficher."},
+      {type:"quiz", q:"Une API sert à...", options:["Faire communiquer deux programmes entre eux","Nettoyer l'ordinateur","Imprimer un document"], correct:0},
+    ]
+  },
+  m20: {
+    title: "Réseaux informatiques", icon: "📡",
+    steps: [
+      {type:"lesson", img:"📡", title:"Qu'est-ce qu'un réseau ?",
+        text:"Un réseau relie plusieurs appareils entre eux pour qu'ils puissent échanger des informations, que ce soit chez toi en Wi-Fi ou sur tout Internet."},
+      {type:"lesson", img:"🏷️", title:"L'adresse IP",
+        text:"Chaque appareil connecté a une adresse IP, un peu comme une adresse postale, qui permet de savoir où envoyer les informations."},
+      {type:"quiz", q:"Une adresse IP identifie...", options:["Un appareil sur un réseau","Un mot de passe","Un fichier"], correct:0},
+    ]
+  },
+  m21: {
+    title: "Cybersécurité", icon: "🛡️",
+    steps: [
+      {type:"lesson", img:"🛡️", title:"Les bonnes pratiques",
+        text:"Mets régulièrement à jour tes logiciels, utilise un antivirus, et évite d'ouvrir des pièces jointes ou liens provenant de personnes inconnues."},
+      {type:"lesson", img:"🎣", title:"Reconnaître le phishing",
+        text:"Le phishing est un faux message (e-mail, SMS) qui imite une entreprise connue pour te voler ton mot de passe, souvent en créant un sentiment d'urgence."},
+      {type:"quiz", q:"Un e-mail qui te demande ton mot de passe en urgence est probablement...", options:["Une tentative de phishing","Un message normal de ta banque","Une mise à jour automatique"], correct:0},
+      {type:"quiz", q:"Pour bien te protéger, il faut...", options:["Mettre à jour régulièrement tes logiciels","Utiliser le même mot de passe partout","Cliquer sur tous les liens reçus"], correct:0},
+    ]
+  },
+  m22: {
+    title: "Intelligence artificielle", icon: "🤖",
+    steps: [
+      {type:"lesson", img:"🤖", title:"Qu'est-ce que l'IA ?",
+        text:"L'intelligence artificielle regroupe des programmes capables d'apprendre à partir de grandes quantités de données pour réaliser des tâches qui demandaient jusque-là une intelligence humaine."},
+      {type:"lesson", img:"✨", title:"Où la croises-tu déjà ?",
+        text:"Les recommandations de vidéos, la reconnaissance faciale de ton téléphone, les assistants vocaux et les chatbots utilisent tous de l'intelligence artificielle."},
+      {type:"quiz", q:"L'intelligence artificielle apprend principalement à partir de...", options:["De grandes quantités de données","De la couleur de l'écran","Du bruit du ventilateur"], correct:0},
+    ]
+  },
+  m23: {
+    title: "Automatisation", icon: "⚙️",
+    steps: [
+      {type:"lesson", img:"⚙️", title:"Qu'est-ce que l'automatisation ?",
+        text:"Automatiser, c'est programmer l'ordinateur pour qu'il réalise seul des tâches répétitives, sans que tu aies à les refaire manuellement à chaque fois."},
+      {type:"lesson", img:"📁", title:"Un exemple simple",
+        text:"Plutôt que de renommer 100 fichiers un par un, un petit script peut les renommer tous automatiquement en quelques secondes."},
+      {type:"quiz", q:"Automatiser une tâche permet surtout de...", options:["Gagner du temps sur des tâches répétitives","Rendre l'ordinateur plus lent","Supprimer tous les fichiers"], correct:0},
+    ]
+  },
+  m24: {
+    title: "Projets pratiques", icon: "🚀",
+    steps: [
+      {type:"lesson", img:"🚀", title:"Passer à de vrais projets",
+        text:"Tu as appris des compétences une par une : ordinateur, clavier, bureautique, code. Un vrai projet les combine toutes ensemble, comme dans le monde professionnel."},
+      {type:"mission", instruction:"Crée ta mini carte de visite en ligne : une balise <h1> avec ton prénom ET une balise <p> avec une phrase qui te décrit.",
+        action:"code_webpage", successMsg:"✅ Bravo, ton premier projet complet est terminé !", badge:"🏆 Premier projet complet",
+        hint:"Il te faut à la fois une balise <h1>Ton prénom</h1> et une balise <p>Une phrase qui te décrit</p>."},
+      {type:"quiz", q:"Un projet réel combine généralement...", options:["Plusieurs compétences apprises séparément","Une seule compétence isolée","Aucune compétence"], correct:0},
+    ]
+  }
+};
+
+const KEYROWS = [
+  ["Échap","F1","F2","F3","F4","F5","F6","F7","F8","F9","F10","F11","F12"],
+  ["1","2","3","4","5","6","7","8","9","0","Backspace"],
+  ["Tab","A","Z","E","R","T","Y","U","I","O","P"],
+  ["Caps","Q","S","D","F","G","H","J","K","L","Entrée"],
+  ["Shift","W","X","C","V","B","N","M","Shift"],
+  ["Ctrl","Windows","Alt","Espace","Alt Gr","Ctrl"]
+];
+const KEY_INFO = {
+  "Échap":"Annule une action ou ferme une fenêtre.",
+  "Entrée":"Valide ce que tu as écrit, ou passe à la ligne.",
+  "Backspace":"Efface la lettre juste avant le curseur.",
+  "Tab":"Fait un grand espace ou passe au champ suivant.",
+  "Caps":"Verrouille les majuscules (Caps Lock).",
+  "Shift":"Maintenue, elle écrit en majuscule ou le symbole du haut.",
+  "Ctrl":"Se combine avec d'autres touches pour des raccourcis (Ctrl+C, Ctrl+V...).",
+  "Alt":"Se combine avec d'autres touches pour des fonctions spéciales.",
+  "Windows":"Ouvre le menu Démarrer de Windows.",
+  "Espace":"Insère un espace entre les mots.",
+  "Alt Gr":"Permet d'écrire des symboles spéciaux (ex: @, #)."
+};
+
+let STATE = JSON.parse(localStorage.getItem('ecole_state')||'null') || {
+  xp:0, level:"🌱 Débutant absolu", completed:{}, badges:[], streak:1, lastDay:null,
+  screen:"home", currentModule:null, currentStep:0
+};
+// migrate old saves that may lack new modules keys
+if(!STATE.completed) STATE.completed={};
+
+function save(){ localStorage.setItem('ecole_state', JSON.stringify(STATE)); }
+function addXP(n){
+  STATE.xp += n;
+  const levels=[[0,"🌱 Débutant absolu"],[50,"🟢 Débutant"],[150,"🔵 Intermédiaire"],[350,"🟣 Avancé"],[700,"🔴 Professionnel"]];
+  for(const [thresh,name] of levels){ if(STATE.xp>=thresh) STATE.level=name; }
+}
+function addBadge(name){ if(!STATE.badges.includes(name)){ STATE.badges.push(name); } }
+function totalSteps(){ let t=0; for(const k in LESSONS) t+=LESSONS[k].steps.length; return t; }
+function doneSteps(){ let t=0; for(const k in STATE.completed) t+=Object.keys(STATE.completed[k]||{}).length; return t; }
+function moduleOrder(){ return Object.keys(LESSONS); }
+function isUnlocked(key){
+  const order=moduleOrder(); const idx=order.indexOf(key);
+  if(idx===0) return true;
+  const prev=order[idx-1];
+  const prevDone=Object.keys(STATE.completed[prev]||{}).length;
+  return prevDone >= LESSONS[prev].steps.length;
+}
+
+function render(){
+  const app=document.getElementById('app');
+  if(STATE.screen==="home") app.innerHTML = renderHome();
+  else if(STATE.screen==="module") app.innerHTML = renderModule();
+  attachHandlers();
+}
+
+function renderHome(){
+  const pct = Math.round(100*doneSteps()/totalSteps());
+  let items = moduleOrder().map((key,i)=>{
+    const mod=LESSONS[key];
+    const done=Object.keys(STATE.completed[key]||{}).length;
+    const isDone = done>=mod.steps.length;
+    const unlocked = isUnlocked(key);
+    const prevTitle = i>0 ? LESSONS[moduleOrder()[i-1]].title : "";
+    return `<div class="path-item ${isDone?'done':''}" ${unlocked?`data-open="${key}"`:`data-locked="${key}" data-prev="${prevTitle}"`}>
+      <div class="card ${unlocked?'':'mod-locked'}">
+        <div class="row" style="align-items:center;gap:14px">
+          <span class="mod-icon">${unlocked? mod.icon : '🔒'}</span>
+          <div style="flex:1">
+            <strong>${mod.title}</strong>
+            <div class="sub">${unlocked ? done+'/'+mod.steps.length+' étapes' : 'Termine le module précédent pour débloquer'}</div>
+          </div>
+        </div>
+      </div>
+    </div>`;
+  }).join("");
+  const badges = STATE.badges.length ? STATE.badges.map(b=>`<div class="badge">${b}</div>`).join("") :
+    `<p class="sub">Termine des leçons pour débloquer des badges 🏆</p>`;
+  const tracks = [
+    {name:"Développement web", icon:"🌍", mods:["HTML","CSS","JavaScript","Git","Développement web"]},
+    {name:"Data / bureautique", icon:"📊", mods:["Excel","Bases de données SQL"]},
+    {name:"Intelligence artificielle", icon:"🤖", mods:["Python","Intelligence artificielle"]},
+    {name:"Cybersécurité", icon:"🛡️", mods:["Sécurité et mots de passe","Cybersécurité"]},
+    {name:"Réseaux & automatisation", icon:"📡", mods:["Réseaux informatiques","Automatisation"]},
+  ];
+  const tracksHtml = tracks.map(t=>`<div class="card"><div class="row" style="align-items:center;gap:12px">
+    <span class="mod-icon">${t.icon}</span><div><strong>${t.name}</strong><div class="sub">${t.mods.join(" · ")}</div></div>
+  </div></div>`).join("");
+  return `
+  <div class="hero">
+    <h1>Nicole</h1>
+    <div class="sub">On part de zéro, une étape à la fois 🌱</div>
+    <div class="hero-stats">
+      <div class="hero-stat"><span class="n">${STATE.level.split(' ')[0]}</span><span class="l">${STATE.level.replace(/^\S+\s/,'')}</span></div>
+      <div class="hero-stat"><span class="n">${STATE.xp}</span><span class="l">points d'expérience</span></div>
+      <div class="hero-stat"><span class="n">🔥 ${STATE.streak}</span><span class="l">jour(s) d'affilée</span></div>
+    </div>
+    <div class="progress-bar"><div class="progress-fill" style="width:${pct}%"></div></div>
+    <div class="sub" style="color:#EADFFF;margin-top:6px">Parcours global : ${pct}%</div>
+  </div>
+  <h3>Ton parcours</h3>
+  <div class="path">${items}</div>
+  <h3>Tes badges</h3>
+  <div class="row">${badges}</div>
+  <h3>Parcours de spécialisation</h3>
+  <p class="sub">Une fois les modules terminés, regroupe tes compétences par domaine :</p>
+  ${tracksHtml}`;
+}
+
+function renderModule(){
+  const mod=LESSONS[STATE.currentModule];
+  const step=mod.steps[STATE.currentStep];
+  let body="";
+  if(step.type==="lesson"){
+    body=`<div class="lesson-img">${step.img}</div><h3>${step.title}</h3><p style="white-space:pre-line">${step.text}</p>
+    <button class="btn big" data-next="1">Suivant →</button>`;
+  } else if(step.type==="quiz"){
+    body=`<h3>Petit quiz</h3><p>${step.q}</p>
+    ${step.options.map((o,i)=>`<button class="btn secondary" style="display:block;width:100%;margin-bottom:8px;text-align:left" data-quiz="${i}">${o}</button>`).join("")}
+    <div id="qfeedback"></div>`;
+  } else if(step.type==="mission"){
+    body=renderMission(step);
+  } else if(step.type==="keyboard_explore"){
+    body=renderKeyboard();
+  }
+  return `
+  <div class="topbar">
+    <button class="link" data-home="1">← Accueil</button>
+    <span class="pill">${STATE.xp} XP</span>
+  </div>
+  <div class="progress-bar"><div class="progress-fill" style="width:${Math.round(100*(STATE.currentStep)/mod.steps.length)}%"></div></div>
+  <div class="card" style="margin-top:12px">${body}</div>`;
+}
+
+function renderMission(step){
+  let inner="";
+  if(step.action==="click_power"){
+    inner=`<div style="text-align:center;margin:16px 0">
+      <button class="btn" id="powerBtn" style="border-radius:50%;width:80px;height:80px;font-size:30px">⏻</button>
+    </div>`;
+  } else if(step.action==="double_click"){
+    inner=`<div style="text-align:center;margin:16px 0">
+      <div id="folderIcon" style="display:inline-block;cursor:pointer;font-size:50px">📁<div class="sub">Mes Documents</div></div>
+    </div>`;
+  } else if(step.action==="type_enter"){
+    inner=`<input type="text" id="missionInput" placeholder="Écris ton prénom puis appuie sur Entrée">`;
+  } else if(step.action==="combo"){
+    inner=`<div id="comboKeys" class="row" style="justify-content:center;margin:16px 0">
+      ${step.combo.map(k=>`<div class="key wide" data-combokey="${k}">${k}</div>`).join('<span style="align-self:center">+</span>')}
+    </div>
+    <p class="sub">Appuie sur ces touches sur ton clavier (ou clique-les) en même temps.</p>`;
+  } else if(step.action==="window_close"){
+    inner=`<div style="border:1px solid var(--border);border-radius:12px;overflow:hidden;margin:16px 0">
+      <div style="background:var(--paper);display:flex;justify-content:flex-end;gap:8px;padding:8px 10px">
+        <span class="key" style="min-width:26px">—</span><span class="key" style="min-width:26px">☐</span>
+        <span class="key" id="closeBtn" style="min-width:26px">✕</span>
+      </div>
+      <div style="padding:24px;text-align:center" class="sub">Une fenêtre ouverte</div>
+    </div>`;
+  } else if(step.action==="rename_folder"){
+    inner=`<div style="text-align:center;margin:16px 0">📁</div>
+      <input type="text" id="renameInput" placeholder="Nom du dossier">`;
+  } else if(step.action==="browser_url"){
+    inner=`<div style="border:1px solid var(--border);border-radius:12px;padding:10px;margin:16px 0;background:var(--paper)">🌐 <input type="text" id="urlInput" placeholder="ex: google.com" style="border:none;width:80%;background:transparent"></div>`;
+  } else if(step.action==="search_query"){
+    inner=`<div style="border:1px solid var(--border);border-radius:999px;padding:10px 16px;margin:16px 0;background:var(--paper)">🔎 <input type="text" id="searchInput" placeholder="ex: recette riz" style="border:none;width:78%;background:transparent"></div>`;
+  } else if(step.action==="compose_email"){
+    inner=`<input type="text" id="emailTo" placeholder="Destinataire (ex: ami@exemple.com)" style="margin-bottom:8px">
+      <input type="text" id="emailMsg" placeholder="Ton message">
+      <button class="btn" id="sendBtn" style="margin-top:10px">Envoyer</button>`;
+  } else if(step.action==="password_check"){
+    inner=`<input type="text" id="pwdInput" placeholder="Ton mot de passe (8 caractères min.)">`;
+  } else if(step.action==="code_html"){
+    inner=`<textarea id="codeInput" rows="3" style="width:100%;font-family:monospace;font-size:14px;padding:10px;border-radius:10px;border:1px solid var(--border);background:var(--paper);color:var(--ink)" placeholder="<h1>Bonjour</h1>"></textarea>
+      <div class="sub" style="margin-top:8px">Aperçu en direct :</div>
+      <div id="codePreview" style="border:1px solid var(--border);border-radius:10px;padding:12px;margin-top:6px;background:var(--card);min-height:24px"></div>
+      <button class="btn" id="runCode" style="margin-top:10px">Vérifier</button>`;
+  } else if(step.action==="code_css"){
+    inner=`<div style="border:1px solid var(--border);border-radius:10px;padding:16px;margin-bottom:10px;background:var(--card)"><span id="cssTarget" style="display:inline-block;padding:8px 14px;border-radius:8px">Bonjour !</span></div>
+      <textarea id="codeInput" rows="2" style="width:100%;font-family:monospace;font-size:14px;padding:10px;border-radius:10px;border:1px solid var(--border);background:var(--paper);color:var(--ink)" placeholder="color: red;"></textarea>
+      <button class="btn" id="runCode" style="margin-top:10px">Appliquer le style</button>`;
+  } else if(step.action==="code_js"){
+    inner=`<textarea id="codeInput" rows="2" style="width:100%;font-family:monospace;font-size:14px;padding:10px;border-radius:10px;border:1px solid var(--border);background:var(--paper);color:var(--ink)" placeholder="5 * 3"></textarea>
+      <button class="btn" id="runCode" style="margin-top:10px">Exécuter</button>
+      <div id="jsResult" class="sub" style="margin-top:8px"></div>`;
+  } else if(step.action==="code_python"){
+    inner=`<textarea id="codeInput" rows="2" style="width:100%;font-family:monospace;font-size:14px;padding:10px;border-radius:10px;border:1px solid var(--border);background:var(--paper);color:var(--ink)" placeholder='print("Bonjour")'></textarea>
+      <button class="btn" id="runCode" style="margin-top:10px">Exécuter</button>
+      <div id="pyResult" class="sub" style="margin-top:8px;font-family:monospace"></div>`;
+  } else if(step.action==="code_webpage"){
+    inner=`<textarea id="codeInput" rows="4" style="width:100%;font-family:monospace;font-size:14px;padding:10px;border-radius:10px;border:1px solid var(--border);background:var(--paper);color:var(--ink)" placeholder="<h1>Mon titre</h1>\n<p>Mon paragraphe</p>"></textarea>
+      <div class="sub" style="margin-top:8px">Aperçu en direct :</div>
+      <div id="codePreview" style="border:1px solid var(--border);border-radius:10px;padding:12px;margin-top:6px;background:var(--card);min-height:24px"></div>
+      <button class="btn" id="runCode" style="margin-top:10px">Vérifier</button>`;
+  }
+  return `<h3>Mission</h3><p>${step.instruction}</p><div class="mission">${inner}<div id="missionFeedback"></div></div>`;
+}
+
+function renderKeyboard(){
+  return `<h3>Clavier interactif</h3><p class="sub">Clique sur une touche pour découvrir son rôle.</p>
+  <div id="keyboard">${KEYROWS.map(row=>`<div class="kbrow">${row.map(k=>
+    `<div class="key ${k.length>3?'wide':''}" data-key="${k}">${k}</div>`).join('')}</div>`).join('')}</div>
+  <div id="keyInfo" class="feedback ok" style="display:none;margin-top:12px"></div>
+  <button class="btn big" style="margin-top:16px" data-next="1">Continuer →</button>`;
+}
+
+function goNext(xpGain, badge){
+  if(xpGain){ addXP(xpGain); }
+  if(badge) addBadge(badge);
+  if(!STATE.completed[STATE.currentModule]) STATE.completed[STATE.currentModule]={};
+  STATE.completed[STATE.currentModule][STATE.currentStep]=true;
+  const mod=LESSONS[STATE.currentModule];
+  if(STATE.currentStep+1 < mod.steps.length){
+    STATE.currentStep++;
+  } else {
+    STATE.screen="home";
+  }
+  save(); render();
+}
+
+function celebrate(html){
+  const el=document.getElementById('missionFeedback');
+  el.innerHTML=`<div class="feedback ok celebrate">${html}</div><button class="btn big celebrate" style="margin-top:10px" data-next="1">Continuer →</button>`;
+  return document.querySelector('[data-next]');
+}
+
+function showToast(msg){
+  let t=document.getElementById('appToast');
+  if(!t){
+    t=document.createElement('div'); t.id='appToast';
+    t.style.cssText='position:fixed;left:16px;right:16px;bottom:calc(20px + env(safe-area-inset-bottom,0px));background:var(--plum);color:#fff;padding:14px 18px;border-radius:14px;font-weight:600;z-index:50;text-align:center;box-shadow:0 8px 24px rgba(0,0,0,.25)';
+    document.body.appendChild(t);
+  }
+  t.textContent=msg; t.style.opacity='1';
+  clearTimeout(window._toastTimer);
+  window._toastTimer=setTimeout(()=>{ t.style.transition='opacity .4s'; t.style.opacity='0'; },2200);
+}
+
+function attachHandlers(){
+  document.querySelectorAll('[data-open]').forEach(el=>el.onclick=()=>{
+    STATE.currentModule=el.dataset.open; STATE.currentStep=0; STATE.screen="module"; save(); render();
+  });
+  document.querySelectorAll('[data-locked]').forEach(el=>el.onclick=()=>{
+    showToast(`🔒 Termine d'abord le module "${el.dataset.prev}" pour débloquer celui-ci.`);
+  });
+  const home=document.querySelector('[data-home]'); if(home) home.onclick=()=>{STATE.screen="home"; save(); render();};
+  const next=document.querySelector('[data-next]'); if(next) next.onclick=()=>goNext(5);
+
+  document.querySelectorAll('[data-quiz]').forEach(el=>el.onclick=()=>{
+    const step=LESSONS[STATE.currentModule].steps[STATE.currentStep];
+    const idx=parseInt(el.dataset.quiz);
+    const fb=document.getElementById('qfeedback');
+    if(idx===step.correct){
+      fb.innerHTML=`<div class="feedback ok celebrate">✅ Bravo, c'est correct !</div><button class="btn big celebrate" style="margin-top:10px" data-next="1">Continuer →</button>`;
+      document.querySelector('[data-next]').onclick=()=>goNext(10);
+    } else {
+      fb.innerHTML=`<div class="feedback err">Pas tout à fait. Réessaie !</div>`;
+    }
+  });
+
+  document.querySelectorAll('[data-key]').forEach(el=>el.onclick=()=>{
+    const k=el.dataset.key;
+    const info=document.getElementById('keyInfo');
+    info.style.display='block';
+    info.textContent = `${k} — ${KEY_INFO[k] || "Une touche utile du clavier."}`;
+    el.classList.add('active'); setTimeout(()=>el.classList.remove('active'),400);
+  });
+
+  const powerBtn=document.getElementById('powerBtn');
+  if(powerBtn) powerBtn.onclick=()=>{
+    celebrate("✅ Parfait, ton ordinateur est \"allumé\" !").onclick=()=>goNext(10,"🏆 Premier démarrage");
+  };
+
+  const folder=document.getElementById('folderIcon');
+  if(folder){
+    let clicks=0, timer=null;
+    folder.onclick=()=>{
+      clicks++;
+      if(timer) clearTimeout(timer);
+      if(clicks>=2){
+        celebrate("✅ Bien joué, le dossier s'ouvre !").onclick=()=>goNext(10);
+        clicks=0;
+      } else { timer=setTimeout(()=>clicks=0,400); }
+    };
+  }
+
+  const closeBtn=document.getElementById('closeBtn');
+  if(closeBtn) closeBtn.onclick=()=>{
+    celebrate("✅ La fenêtre est fermée !").onclick=()=>goNext(10,"🏆 Première fenêtre fermée");
+  };
+
+  const renameInput=document.getElementById('renameInput');
+  if(renameInput) renameInput.onkeydown=(e)=>{
+    if(e.key==="Enter" && renameInput.value.trim().toLowerCase().includes("mes documents")){
+      celebrate("✅ Dossier renommé avec succès !").onclick=()=>goNext(10,"🏆 Premier dossier renommé");
+    } else if(e.key==="Enter"){
+      document.getElementById('missionFeedback').innerHTML=`<div class="feedback err">Essaie d'écrire exactement "Mes Documents".</div>`;
+    }
+  };
+
+  const urlInput=document.getElementById('urlInput');
+  if(urlInput) urlInput.onkeydown=(e)=>{
+    if(e.key==="Enter" && urlInput.value.trim().length>0){
+      celebrate(`✅ Direction ${urlInput.value} ! Tu sais utiliser la barre d'adresse.`).onclick=()=>goNext(10,"🏆 Première adresse web");
+    }
+  };
+  const searchInput=document.getElementById('searchInput');
+  if(searchInput) searchInput.onkeydown=(e)=>{
+    if(e.key==="Enter" && searchInput.value.trim().length>0){
+      celebrate("✅ Recherche envoyée ! Tu sais chercher sur Internet.").onclick=()=>goNext(10,"🏆 Première recherche");
+    }
+  };
+  const sendBtn=document.getElementById('sendBtn');
+  if(sendBtn) sendBtn.onclick=()=>{
+    const to=document.getElementById('emailTo').value.trim(), msg=document.getElementById('emailMsg').value.trim();
+    if(to.length>0 && msg.length>0){
+      celebrate("✅ E-mail envoyé avec succès !").onclick=()=>goNext(10,"🏆 Premier e-mail");
+    } else {
+      document.getElementById('missionFeedback').innerHTML=`<div class="feedback err">Remplis le destinataire et le message avant d'envoyer.</div>`;
+    }
+  };
+  const pwdInput=document.getElementById('pwdInput');
+  if(pwdInput) pwdInput.onkeydown=(e)=>{
+    if(e.key==="Enter"){
+      if(pwdInput.value.length>=8){
+        celebrate("✅ Bien joué, ce mot de passe est assez long !").onclick=()=>goNext(10,"🏆 Premier mot de passe fort");
+      } else {
+        document.getElementById('missionFeedback').innerHTML=`<div class="feedback err">Trop court : il faut au moins 8 caractères. Réessaie.</div>`;
+      }
+    }
+  };
+  const runCode=document.getElementById('runCode');
+  if(runCode){
+    const step=LESSONS[STATE.currentModule].steps[STATE.currentStep];
+    runCode.onclick=()=>{
+      const val=document.getElementById('codeInput').value;
+      if(step.action==="code_html"){
+        const preview=document.getElementById('codePreview');
+        preview.innerHTML = val.replace(/<script[\s\S]*?<\/script>/gi,'');
+        if(/<h1[^>]*>[\s\S]*<\/h1>/i.test(val)){
+          celebrate(step.successMsg).onclick=()=>goNext(15, step.badge);
+        } else {
+          document.getElementById('missionFeedback').innerHTML=`<div class="feedback err">${step.hint}</div>`;
+        }
+      } else if(step.action==="code_css"){
+        const target=document.getElementById('cssTarget');
+        try{ target.style.cssText = val; }catch(e){}
+        if(/color\s*:/i.test(val)){
+          celebrate(step.successMsg).onclick=()=>goNext(15, step.badge);
+        } else {
+          document.getElementById('missionFeedback').innerHTML=`<div class="feedback err">${step.hint}</div>`;
+        }
+      } else if(step.action==="code_js"){
+        const resEl=document.getElementById('jsResult');
+        if(/^[0-9+\-*/(). ]+$/.test(val) && val.trim().length>0){
+          let result=null;
+          try{ result = Function('"use strict";return ('+val+')')(); }catch(e){}
+          if(result!==null && !isNaN(result)){
+            resEl.textContent = "Résultat : " + result;
+            celebrate(`✅ JavaScript a calculé ${result} pour toi !`).onclick=()=>goNext(15, step.badge);
+          } else {
+            document.getElementById('missionFeedback').innerHTML=`<div class="feedback err">Expression non valide, réessaie (ex: 5*3).</div>`;
+          }
+        } else {
+          document.getElementById('missionFeedback').innerHTML=`<div class="feedback err">Écris uniquement un calcul avec des chiffres (ex: 5*3).</div>`;
+        }
+      } else if(step.action==="code_python"){
+        const resEl=document.getElementById('pyResult');
+        const m = val.match(/print\(\s*["'](.*)["']\s*\)/);
+        if(m){
+          resEl.textContent = ">>> " + m[1];
+          celebrate(step.successMsg).onclick=()=>goNext(15, step.badge);
+        } else {
+          document.getElementById('missionFeedback').innerHTML=`<div class="feedback err">${step.hint}</div>`;
+        }
+      } else if(step.action==="code_webpage"){
+        const preview=document.getElementById('codePreview');
+        preview.innerHTML = val.replace(/<script[\s\S]*?<\/script>/gi,'');
+        if(/<h1[^>]*>[\s\S]*<\/h1>/i.test(val) && /<p[^>]*>[\s\S]*<\/p>/i.test(val)){
+          celebrate(step.successMsg).onclick=()=>goNext(15, step.badge);
+        } else {
+          document.getElementById('missionFeedback').innerHTML=`<div class="feedback err">${step.hint}</div>`;
+        }
+      }
+    };
+  }
+  const missionInput=document.getElementById('missionInput');
+  if(missionInput){
+    missionInput.onkeydown=(e)=>{
+      if(e.key==="Enter" && missionInput.value.trim().length>0){
+        const step=LESSONS[STATE.currentModule].steps[STATE.currentStep];
+        const msg = step.successMsg ? step.successMsg : `✅ Super, ${missionInput.value} ! Tu as utilisé la touche Entrée.`;
+        const badge = step.badge || "🏆 Premier texte écrit";
+        celebrate(msg).onclick=()=>goNext(10,badge);
+      }
+    };
+  }
+
+  const comboEl=document.getElementById('comboKeys');
+  if(comboEl){
+    const step=LESSONS[STATE.currentModule].steps[STATE.currentStep];
+    const needed=step.combo.map(k=>k.toLowerCase());
+    let pressed=new Set();
+    function checkCombo(){
+      if(needed.every(k=>pressed.has(k))){
+        celebrate("✅ Exact ! Raccourci réussi.").onclick=()=>goNext(15,"🏆 Premier raccourci clavier");
+        document.removeEventListener('keydown',onKD); document.removeEventListener('keyup',onKU);
+      }
+    }
+    function normalize(e){ if(e.key==="Control") return "ctrl"; if(e.key===" ") return "espace"; return e.key.toLowerCase(); }
+    function onKD(e){ pressed.add(normalize(e)); checkCombo(); }
+    function onKU(e){ pressed.delete(normalize(e)); }
+    document.addEventListener('keydown',onKD); document.addEventListener('keyup',onKU);
+    document.querySelectorAll('[data-combokey]').forEach(el=>el.onclick=()=>{
+      pressed.add(el.dataset.combokey.toLowerCase()); el.classList.add('done'); checkCombo();
+    });
+  }
+}
+
+render();
+</script>
+</body>
+</html>
